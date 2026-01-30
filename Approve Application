@@ -1,0 +1,15 @@
+fn approve_application(accounts: &[AccountInfo]) -> ProgramResult {
+    let account_iter = &mut accounts.iter();
+
+    let authority = next_account_info(account_iter)?;
+    let application_account = next_account_info(account_iter)?;
+
+    if !authority.is_signer {
+        return Err(ProgramError::MissingRequiredSignature);
+    }
+
+    application_account.data.borrow_mut()[0] = 1; // approved = true
+
+    msg!("Application approved");
+    Ok(())
+}
