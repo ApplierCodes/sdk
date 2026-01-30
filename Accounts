@@ -1,0 +1,59 @@
+#[derive(Accounts)]
+pub struct Initialize<'info> {
+    #[account(init, payer = authority, space = 8 + 32)]
+    pub state: Account<'info, State>,
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct VerifyIdentity<'info> {
+    #[account(mut, has_one = authority)]
+    pub state: Account<'info, State>,
+
+    #[account(
+        init,
+        payer = authority,
+        space = 8 + 32 + 1 + 32
+    )]
+    pub identity: Account<'info, Identity>,
+
+    /// CHECK: user to be verified
+    pub user: UncheckedAccount<'info>,
+
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct SubmitApplication<'info> {
+    #[account(
+        mut,
+        constraint = identity.user == user.key()
+    )]
+    pub identity: Account<'info, Identity>,
+
+    #[account(
+        init,
+        payer = user,
+        space = 8 + 32 + 4 + 200 + 1
+    )]
+    pub application: Account<'info, Application>,
+
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct ApproveApplication<'info> {
+    #[account(has_one = authority)]
+    pub state: Account<'info, State>,
+
+    #[account(mut)]
+    pub application: Account<'info, Application>,
+
+    pub authority: Signer<'info>,
+}
