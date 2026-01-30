@@ -1,0 +1,15 @@
+fn verify_identity(accounts: &[AccountInfo]) -> ProgramResult {
+    let account_iter = &mut accounts.iter();
+
+    let authority = next_account_info(account_iter)?;
+    let identity_account = next_account_info(account_iter)?;
+
+    if !authority.is_signer {
+        return Err(ProgramError::MissingRequiredSignature);
+    }
+
+    identity_account.data.borrow_mut()[0] = 1; // verified = true
+
+    msg!("Identity verified");
+    Ok(())
+}
