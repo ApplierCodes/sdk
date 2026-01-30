@@ -1,0 +1,20 @@
+fn submit_application(accounts: &[AccountInfo]) -> ProgramResult {
+    let account_iter = &mut accounts.iter();
+
+    let user = next_account_info(account_iter)?;
+    let identity_account = next_account_info(account_iter)?;
+    let application_account = next_account_info(account_iter)?;
+
+    if !user.is_signer {
+        return Err(ProgramError::MissingRequiredSignature);
+    }
+
+    if identity_account.data.borrow()[0] != 1 {
+        return Err(ProgramError::InvalidAccountData);
+    }
+
+    application_account.data.borrow_mut()[0] = 0; // approved = false
+
+    msg!("Application submitted");
+    Ok(())
+}
